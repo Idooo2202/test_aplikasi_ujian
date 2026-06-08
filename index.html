@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistem Ujian CBT - Maximum Security</title>
+    <title>CBT - ABSOLUTE FINAL BOSS</title>
     <style>
         :root {
             --bg-color: #000000;
-            --container-bg: #121212;
+            --container-bg: #101010;
             --text-color: #e0e0e0;
             --accent-color: #00e676;
-            --warning-color: #ff1744;
-            --border-color: #333333;
+            --warning-color: #ff003c;
+            --border-color: #333;
         }
 
         body {
@@ -35,13 +35,14 @@
             padding: 20px;
             border-radius: 10px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            box-shadow: 0 4px 30px rgba(255, 0, 60, 0.1);
             margin-bottom: 20px;
             position: relative;
             z-index: 10;
         }
 
-        h1, h2 { margin-top: 0; font-size: 1.5rem; text-align: center; }
+        h1 { margin-top: 0; font-size: 1.6rem; text-align: center; color: var(--warning-color); text-transform: uppercase; letter-spacing: 2px;}
+        h2 { font-size: 1.2rem; }
 
         button {
             background-color: var(--accent-color);
@@ -49,33 +50,34 @@
             border: none;
             padding: 15px 20px;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 900;
             border-radius: 8px;
             cursor: pointer;
             width: 100%;
-            margin-top: 10px;
-            box-shadow: 0 4px 10px rgba(0, 230, 118, 0.2);
+            margin-top: 15px;
+            text-transform: uppercase;
         }
 
-        button:active { background-color: #00c853; transform: scale(0.98); }
+        button:active { transform: scale(0.98); }
         .hidden { display: none !important; }
 
         .question-block {
             margin-bottom: 25px;
             padding-bottom: 15px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid #222;
         }
 
-        .question-block p { font-size: 1.1rem; line-height: 1.4; }
+        .question-block p { font-size: 1.1rem; line-height: 1.5; }
 
         .options label {
             display: block;
             margin: 12px 0;
-            padding: 12px;
-            background-color: #1a1a1a;
+            padding: 15px;
+            background-color: #151515;
             border-radius: 5px;
             cursor: pointer;
-            border: 1px solid #222;
+            border: 1px solid #2a2a2a;
+            transition: 0.2s;
         }
 
         .options input[type="radio"] { transform: scale(1.3); margin-right: 15px; }
@@ -83,12 +85,12 @@
         .overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.98);
+            background-color: rgba(0, 0, 0, 0.99);
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            z-index: 9999;
+            z-index: 99999;
             color: var(--warning-color);
             text-align: center;
             padding: 20px;
@@ -98,15 +100,14 @@
         .overlay button {
             background-color: var(--warning-color);
             color: white;
-            margin-top: 30px;
+            margin-top: 40px;
             width: 80%;
-            box-shadow: 0 4px 10px rgba(255, 23, 68, 0.3);
         }
 
         #statusBox {
             position: sticky;
             top: 0;
-            background-color: #050505;
+            background-color: #000;
             padding: 15px;
             margin: -20px -20px 20px -20px;
             border-bottom: 2px solid var(--warning-color);
@@ -114,21 +115,14 @@
             font-size: 1.2rem;
             z-index: 100;
             text-align: center;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
         }
 
-        /* Dead Zones untuk memblokir interaksi di tepi layar (mencegah gesture) */
+        /* Dead Zones */
         .dead-zone-top, .dead-zone-bottom {
-            position: fixed;
-            left: 0;
-            width: 100%;
-            height: 15px; /* 15 pixel dari tepi */
-            z-index: 9998;
+            position: fixed; left: 0; width: 100%; height: 10px; z-index: 9998;
         }
         .dead-zone-top { top: 0; }
         .dead-zone-bottom { bottom: 0; }
-
     </style>
 </head>
 <body>
@@ -137,14 +131,15 @@
     <div class="dead-zone-bottom"></div>
 
     <div id="introPage" class="container">
-        <h1 style="color: var(--warning-color);">SECURITY LEVEL: MAXIMUM</h1>
-        <p>Sistem ini mengunci orientasi, mewajibkan Fullscreen, dan memindai Aspect Ratio layar.</p>
+        <h1>Absolute Boss Security</h1>
+        <p style="text-align: center; color: #888; font-size: 0.9rem;">v4.0 - Hardware Level Scanning</p>
+        <p>Sistem ini sekarang membaca resolusi perangkat keras aslimu. Tidak ada ampun untuk:</p>
         <ul style="color: #bbb; padding-left: 20px; font-size: 0.9rem;">
-            <li>Wajib mode potret (tegak).</li>
-            <li>Mengaktifkan Split Screen akan mengeluarkan Anda dari Fullscreen dan menghentikan ujian.</li>
-            <li>Area ujung atas dan bawah layar tidak bisa disentuh (Dead-Zone).</li>
+            <li>Pop-up / Floating Windows.</li>
+            <li>Split Screen vertikal maupun horizontal.</li>
+            <li>Notifikasi mengambang (WhatsApp, dll).</li>
         </ul>
-        <button onclick="mulaiUjian()">Mulai Ujian & Kunci Layar</button>
+        <button onclick="mulaiUjian()">Kunci Layar & Mulai</button>
     </div>
 
     <div id="examPage" class="container hidden">
@@ -156,15 +151,16 @@
     </div>
 
     <div id="warningOverlay" class="overlay hidden">
-        <h1 style="font-size: 2.5rem; margin-bottom: 10px;">⚠️ PERINGATAN ⚠️</h1>
-        <h2 id="warningText" style="font-size: 1.2rem; color: #fff;">Sistem terganggu!</h2>
-        <p id="warningDetail" style="color: #aaa; font-size: 0.9rem;">Aktivitas terlarang terdeteksi.</p>
+        <h1 style="font-size: 3rem; margin-bottom: 10px;">⚠️ TERDETEKSI ⚠️</h1>
+        <h2 id="warningText" style="font-size: 1.2rem; color: #fff;">Sistem Keamanan Terpicu!</h2>
+        <p id="warningDetail" style="color: #ff003c; font-size: 1rem; font-family: monospace; background: #111; padding: 10px; border-radius: 5px;"></p>
         <button onclick="lanjutkanUjian()">Kembali ke Mode Aman</button>
     </div>
 
     <div id="disqualifiedOverlay" class="overlay hidden">
-        <h1 style="font-size: 2.5rem; color: var(--warning-color);">❌ BLOKIR ❌</h1>
-        <h2>Sesi dikunci permanen.</h2>
+        <h1 style="font-size: 3rem; color: var(--warning-color);">❌ BLOKIR ❌</h1>
+        <h2>Sesi dihancurkan.</h2>
+        <p style="color: #666;">Anda telah melampaui batas toleransi sistem.</p>
     </div>
 
     <script>
@@ -176,7 +172,6 @@
             { q: "Sistem bilangan yang terdiri dari angka 0 dan 1 disebut?", opts: ["Desimal", "Hexadesimal", "Biner"] }
         ];
 
-        // Duplikasi array soal agar halaman menjadi panjang
         const fullQuestions = [...questionsData, ...questionsData, ...questionsData];
 
         const qContainer = document.getElementById('questionsContainer');
@@ -193,7 +188,6 @@
         let pelanggaran = parseInt(sessionStorage.getItem('pelanggaranCount')) || 0;
         const maxPelanggaran = 3;
         let coreEngineInterval;
-        let targetRatio = 0;
 
         const introPage = document.getElementById('introPage');
         const examPage = document.getElementById('examPage');
@@ -207,7 +201,7 @@
             if (isExamActive) {
                 introPage.classList.add('hidden');
                 examPage.classList.remove('hidden');
-                catatPelanggaran("Refresh / Memuat ulang halaman");
+                catatPelanggaran("Refresh / Reload terdeteksi");
             } else if (sessionStorage.getItem('disqualified') === 'true') {
                 introPage.classList.add('hidden');
                 disqualifiedOverlay.classList.remove('hidden');
@@ -217,26 +211,18 @@
 
         window.onpopstate = function() {
             window.history.pushState(null, "", window.location.href);
-            if (isExamActive) catatPelanggaran("Mencoba menggunakan tombol Back");
+            if (isExamActive) catatPelanggaran("Mencoba tombol Back");
         };
 
         async function mulaiUjian() {
             try {
-                // Paksa masuk ke Fullscreen API. Jika gagal/ditolak, ujian tidak mulai.
                 if (document.documentElement.requestFullscreen) {
                     await document.documentElement.requestFullscreen();
-                } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+                } else if (document.documentElement.webkitRequestFullscreen) { 
                     await document.documentElement.webkitRequestFullscreen();
                 }
-                
-                // Kunci orientasi ke Portrait jika API didukung (khusus mobile)
-                if (screen.orientation && screen.orientation.lock) {
-                    screen.orientation.lock("portrait-primary").catch(function(error) {
-                        console.log("Orientation lock failed/unsupported", error);
-                    });
-                }
             } catch (err) {
-                alert("Harap izinkan mode layar penuh (Fullscreen) untuk memulai ujian!");
+                alert("Gagal masuk mode aman. Pastikan browser mendukung Fullscreen.");
                 return;
             }
 
@@ -246,11 +232,7 @@
             sessionStorage.setItem('examActive', 'true');
             document.body.style.paddingBottom = "150px"; 
             
-            // Catat rasio aspek murni HP saat dalam keadaan fullscreen penuh
-            setTimeout(() => {
-                targetRatio = window.innerHeight / window.innerWidth;
-                startCoreEngine();
-            }, 500);
+            setTimeout(() => { startBossEngine(); }, 1000);
         }
 
         async function lanjutkanUjian() {
@@ -259,7 +241,6 @@
                     await document.documentElement.requestFullscreen();
                 }
             } catch (e) {}
-
             warningOverlay.classList.add('hidden');
             setTimeout(() => { isExamActive = true; }, 500); 
         }
@@ -270,7 +251,7 @@
             sessionStorage.clear();
             examPage.classList.add('hidden');
             if (document.exitFullscreen) document.exitFullscreen();
-            alert("Ujian Selesai!");
+            alert("Ujian Selesai! Pertahanan tidak tertembus.");
             location.reload(); 
         }
 
@@ -283,8 +264,8 @@
             if (pelanggaran > maxPelanggaran) {
                 diskualifikasi();
             } else {
-                document.getElementById('warningText').innerText = `Pelanggaran ke-${pelanggaran}`;
-                warningDetail.innerText = `Detail: ${jenis}`;
+                document.getElementById('warningText').innerText = `Pelanggaran [${pelanggaran}/${maxPelanggaran}]`;
+                warningDetail.innerText = `>> ${jenis}`;
                 warningOverlay.classList.remove('hidden');
                 isExamActive = false; 
             }
@@ -302,76 +283,82 @@
         }
 
         /* ==========================================
-           CORE ENGINE: MAXIMUM SECURITY
+           THE FINAL BOSS ENGINE
            ========================================== */
         
-        function startCoreEngine() {
+        function startBossEngine() {
             coreEngineInterval = setInterval(() => {
                 if (!isExamActive) return;
                 
-                // 1. DETEKSI FULLSCREEN KELUAR PAKSA
-                // Saat Split Screen aktif, browser otomatis kehilangan status fullscreen-nya.
-                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                    catatPelanggaran("Meninggalkan mode Fullscreen (Split Screen / Navigasi dibuka)");
+                // 1. HARDWARE WIDTH VS VIEWPORT WIDTH (THE POP-UP KILLER)
+                // Membandingkan lebar fisik layar HP dengan lebar browser saat ini.
+                // Jika browser berjalan sebagai Pop-up, lebarnya pasti lebih kecil dari layar HP.
+                const physicalScreenWidth = window.screen.width;
+                const browserWidth = window.innerWidth;
+
+                // Toleransi 5% untuk scrollbar/margin sistem operasi. 
+                // Jika lebar browser kurang dari 95% lebar fisik HP = POP-UP!
+                if (browserWidth < (physicalScreenWidth * 0.95)) {
+                    catatPelanggaran("Floating Window / Pop-up Screen Terdeteksi!");
                     return;
                 }
 
-                // 2. DETEKSI ASPECT RATIO (Bentuk Layar)
-                // HP normal dalam mode potret memiliki rasio tinggi dibagi lebar sekitar 1.7 hingga 2.2
-                // Jika viewport tiba-tiba mengotak (rasio di bawah 1.3), itu pasti Split Screen atau Floating Keyboard ekstrem.
+                // 2. ASPECT RATIO (THE SPLIT-SCREEN KILLER)
                 const currentRatio = window.innerHeight / window.innerWidth;
                 if (currentRatio < 1.3) {
-                    catatPelanggaran("Perubahan drastis bentuk layar (Terdeteksi Split Screen)");
+                    catatPelanggaran("Rasio layar ilegal (Split Screen / Keyboard Float)");
                     return;
                 }
 
-            }, 800); // Scan sangat cepat setiap 0.8 detik
+                // 3. FULLSCREEN STATE MONITORING
+                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                    catatPelanggaran("Keluar dari Mode Fullscreen Paksa");
+                    return;
+                }
+
+                // 4. ABSOLUTE FOCUS MONITORING
+                // Ini lebih ganas dari 'blur' event. Mengecek status fokus secara real-time.
+                // Jika ada chat heads WhatsApp atau pop-up OS muncul, browser kehilangan 'Focus State'.
+                if (!document.hasFocus()) {
+                    catatPelanggaran("Browser kehilangan fokus / Tertumpuk aplikasi lain");
+                    return;
+                }
+
+            }, 500); // Radar memindai setiap SETENGAH detik tanpa ampun.
         }
 
         /* ==========================================
-           SENSOR TAMBAHAN & HIJACKING
+           SENSOR EVENT DRIVEN STANDAR
            ========================================== */
         
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden' && isExamActive) {
-                catatPelanggaran("Aplikasi berjalan di latar belakang");
+                catatPelanggaran("Aplikasi pindah ke Background");
             }
         });
 
         window.addEventListener('blur', () => {
-            if (isExamActive) catatPelanggaran("Kehilangan fokus (Terdapat Pop-up atau Overlay)");
+            if (isExamActive) catatPelanggaran("Blur Event Terpicu");
         });
 
         document.addEventListener('contextmenu', (event) => {
             if (isExamActive) {
                 event.preventDefault(); 
-                catatPelanggaran("Aksi tahan layar (Long-press) diblokir");
+                catatPelanggaran("Klik kanan / Tahan layar diblokir");
             }
         });
 
-        // Memblokir interaksi sentuhan di area Dead-Zone (mencegah user iseng menarik notifikasi)
         const deadZoneTop = document.querySelector('.dead-zone-top');
         const deadZoneBottom = document.querySelector('.dead-zone-bottom');
-        
         deadZoneTop.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); }, { passive: false });
         deadZoneBottom.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); }, { passive: false });
 
         document.addEventListener('touchstart', (e) => {
             if (isExamActive && e.touches.length > 1) {
                 e.preventDefault();
-                catatPelanggaran("Multi-touch terdeteksi");
+                catatPelanggaran("Multi-touch / Gesture OS diblokir");
             }
         }, { passive: false });
-
-        window.addEventListener('scroll', () => {
-            if (!isExamActive) return;
-            const scrollPosition = Math.ceil(window.innerHeight + window.scrollY);
-            const bodyHeight = document.body.offsetHeight;
-            if (scrollPosition >= bodyHeight - 5) {
-                catatPelanggaran("Menarik batas akhir halaman (Scroll mentok)");
-                window.scrollTo({ top: window.scrollY - 150, behavior: 'smooth' });
-            }
-        });
 
     </script>
 </body>
