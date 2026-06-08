@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistem Ujian CBT Mobile - Ultra Strict</title>
+    <title>Sistem Ujian CBT - Maximum Security</title>
     <style>
         :root {
             --bg-color: #000000;
@@ -20,14 +20,14 @@
             color: var(--text-color);
             margin: 0;
             padding: 15px;
-            
             overscroll-behavior-y: none; 
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
             -webkit-touch-callout: none;
-            touch-action: pan-y; /* Hanya izinkan scroll vertikal, blokir zoom/pan horizontal */
+            touch-action: pan-y;
+            overflow-x: hidden;
         }
 
         .container {
@@ -35,11 +35,13 @@
             padding: 20px;
             border-radius: 10px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
             margin-bottom: 20px;
+            position: relative;
+            z-index: 10;
         }
 
-        h1, h2 { margin-top: 0; font-size: 1.5rem; }
+        h1, h2 { margin-top: 0; font-size: 1.5rem; text-align: center; }
 
         button {
             background-color: var(--accent-color);
@@ -52,10 +54,10 @@
             cursor: pointer;
             width: 100%;
             margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(0, 230, 118, 0.2);
         }
 
-        button:active { background-color: #00c853; }
-
+        button:active { background-color: #00c853; transform: scale(0.98); }
         .hidden { display: none !important; }
 
         .question-block {
@@ -64,24 +66,19 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        .question-block p {
-            font-size: 1.1rem;
-            line-height: 1.4;
-        }
+        .question-block p { font-size: 1.1rem; line-height: 1.4; }
 
         .options label {
             display: block;
             margin: 12px 0;
-            padding: 10px;
-            background-color: #1e1e1e;
+            padding: 12px;
+            background-color: #1a1a1a;
             border-radius: 5px;
             cursor: pointer;
+            border: 1px solid #222;
         }
 
-        .options input[type="radio"] {
-            transform: scale(1.2);
-            margin-right: 10px;
-        }
+        .options input[type="radio"] { transform: scale(1.3); margin-right: 15px; }
 
         .overlay {
             position: fixed;
@@ -103,12 +100,13 @@
             color: white;
             margin-top: 30px;
             width: 80%;
+            box-shadow: 0 4px 10px rgba(255, 23, 68, 0.3);
         }
 
         #statusBox {
             position: sticky;
             top: 0;
-            background-color: #000;
+            background-color: #050505;
             padding: 15px;
             margin: -20px -20px 20px -20px;
             border-bottom: 2px solid var(--warning-color);
@@ -119,20 +117,34 @@
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
         }
+
+        /* Dead Zones untuk memblokir interaksi di tepi layar (mencegah gesture) */
+        .dead-zone-top, .dead-zone-bottom {
+            position: fixed;
+            left: 0;
+            width: 100%;
+            height: 15px; /* 15 pixel dari tepi */
+            z-index: 9998;
+        }
+        .dead-zone-top { top: 0; }
+        .dead-zone-bottom { bottom: 0; }
+
     </style>
 </head>
 <body>
 
+    <div class="dead-zone-top"></div>
+    <div class="dead-zone-bottom"></div>
+
     <div id="introPage" class="container">
-        <h1>Simulasi CBT Mobile - Ultra Strict</h1>
-        <p>Selain sensor dasar, sistem ini memonitor manipulasi OS tingkat lanjut.</p>
-        <ul style="color: #bbb; padding-left: 20px;">
-            <li>Dilarang mengaktifkan Split Screen.</li>
-            <li>Dilarang membuka Pop-up / Floating Window.</li>
-            <li>Dilarang memutar rotasi layar.</li>
-            <li>Dilarang menggunakan *gesture* multi-jari.</li>
+        <h1 style="color: var(--warning-color);">SECURITY LEVEL: MAXIMUM</h1>
+        <p>Sistem ini mengunci orientasi, mewajibkan Fullscreen, dan memindai Aspect Ratio layar.</p>
+        <ul style="color: #bbb; padding-left: 20px; font-size: 0.9rem;">
+            <li>Wajib mode potret (tegak).</li>
+            <li>Mengaktifkan Split Screen akan mengeluarkan Anda dari Fullscreen dan menghentikan ujian.</li>
+            <li>Area ujung atas dan bawah layar tidak bisa disentuh (Dead-Zone).</li>
         </ul>
-        <button onclick="mulaiUjian()">Mulai Ujian</button>
+        <button onclick="mulaiUjian()">Mulai Ujian & Kunci Layar</button>
     </div>
 
     <div id="examPage" class="container hidden">
@@ -144,15 +156,15 @@
     </div>
 
     <div id="warningOverlay" class="overlay hidden">
-        <h1 style="font-size: 2.5rem; margin-bottom: 10px;">⚠️ PERINGATAN! ⚠️</h1>
-        <h2 id="warningText" style="font-size: 1.2rem; color: #fff;">Sistem mendeteksi aktivitas mencurigakan!</h2>
-        <p style="color: #aaa;">Aktivitas Anda telah dicatat oleh sistem.</p>
-        <button onclick="tutupPeringatan()">Lanjutkan Ujian</button>
+        <h1 style="font-size: 2.5rem; margin-bottom: 10px;">⚠️ PERINGATAN ⚠️</h1>
+        <h2 id="warningText" style="font-size: 1.2rem; color: #fff;">Sistem terganggu!</h2>
+        <p id="warningDetail" style="color: #aaa; font-size: 0.9rem;">Aktivitas terlarang terdeteksi.</p>
+        <button onclick="lanjutkanUjian()">Kembali ke Mode Aman</button>
     </div>
 
     <div id="disqualifiedOverlay" class="overlay hidden">
         <h1 style="font-size: 2.5rem; color: var(--warning-color);">❌ BLOKIR ❌</h1>
-        <h2>Sesi dikunci secara permanen.</h2>
+        <h2>Sesi dikunci permanen.</h2>
     </div>
 
     <script>
@@ -160,17 +172,15 @@
             { q: "Apa fungsi dari tag <script> pada HTML?", opts: ["Menambahkan CSS", "Menyisipkan JavaScript", "Membuat tabel"] },
             { q: "Manakah event JS yang terpicu saat user pindah ke aplikasi lain di HP?", opts: ["visibilitychange", "onhover", "ondblclick"] },
             { q: "Apa nama properti CSS untuk mencegah pull-to-refresh di mobile?", opts: ["overflow: hidden", "overscroll-behavior-y: none", "touch-action: pan-x"] },
-            { q: "Bagaimana cara mencegah user melakukan copy text di web?", opts: ["user-select: none", "text-align: center", "font-weight: bold"] },
-            { q: "Di mana letak penyimpanan variabel yang tidak hilang saat direfresh tapi hilang saat tab ditutup?", opts: ["localStorage", "Cookies", "sessionStorage"] },
             { q: "Framework apa yang menggunakan bahasa Dart?", opts: ["React Native", "Flutter", "Laravel"] },
-            { q: "Manakah yang merupakan bahasa backend?", opts: ["HTML", "CSS", "PHP"] },
-            { q: "Apa kepanjangan dari DOM?", opts: ["Document Object Model", "Data Oriented Management", "Digital Output Module"] },
-            { q: "Untuk membajak tombol 'Back' di browser, API apa yang digunakan?", opts: ["Canvas API", "History API", "Fetch API"] },
             { q: "Sistem bilangan yang terdiri dari angka 0 dan 1 disebut?", opts: ["Desimal", "Hexadesimal", "Biner"] }
         ];
 
+        // Duplikasi array soal agar halaman menjadi panjang
+        const fullQuestions = [...questionsData, ...questionsData, ...questionsData];
+
         const qContainer = document.getElementById('questionsContainer');
-        questionsData.forEach((item, index) => {
+        fullQuestions.forEach((item, index) => {
             let html = `<div class="question-block"><p><strong>${index + 1}. ${item.q}</strong></p><div class="options">`;
             item.opts.forEach((opt, i) => {
                 html += `<label><input type="radio" name="q${index}" value="${i}"> ${opt}</label>`;
@@ -182,28 +192,21 @@
         let isExamActive = sessionStorage.getItem('examActive') === 'true';
         let pelanggaran = parseInt(sessionStorage.getItem('pelanggaranCount')) || 0;
         const maxPelanggaran = 3;
-
-        // Variabel untuk sensor lanjutan
-        let initialWidth = 0;
-        let initialHeight = 0;
-        let lastTime = Date.now();
-        let heartbeatInterval;
+        let coreEngineInterval;
+        let targetRatio = 0;
 
         const introPage = document.getElementById('introPage');
         const examPage = document.getElementById('examPage');
         const warningOverlay = document.getElementById('warningOverlay');
         const disqualifiedOverlay = document.getElementById('disqualifiedOverlay');
         const violationText = document.getElementById('violationCount');
+        const warningDetail = document.getElementById('warningDetail');
 
         window.onload = function() {
             violationText.innerText = pelanggaran;
             if (isExamActive) {
                 introPage.classList.add('hidden');
                 examPage.classList.remove('hidden');
-                // Mengambil ulang dimensi awal setelah refresh
-                initialWidth = window.innerWidth;
-                initialHeight = window.innerHeight;
-                startHeartbeat();
                 catatPelanggaran("Refresh / Memuat ulang halaman");
             } else if (sessionStorage.getItem('disqualified') === 'true') {
                 introPage.classList.add('hidden');
@@ -214,35 +217,65 @@
 
         window.onpopstate = function() {
             window.history.pushState(null, "", window.location.href);
-            if (isExamActive) catatPelanggaran("Swipe Back / Tombol Kembali HP");
+            if (isExamActive) catatPelanggaran("Mencoba menggunakan tombol Back");
         };
 
-        function mulaiUjian() {
+        async function mulaiUjian() {
+            try {
+                // Paksa masuk ke Fullscreen API. Jika gagal/ditolak, ujian tidak mulai.
+                if (document.documentElement.requestFullscreen) {
+                    await document.documentElement.requestFullscreen();
+                } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+                    await document.documentElement.webkitRequestFullscreen();
+                }
+                
+                // Kunci orientasi ke Portrait jika API didukung (khusus mobile)
+                if (screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock("portrait-primary").catch(function(error) {
+                        console.log("Orientation lock failed/unsupported", error);
+                    });
+                }
+            } catch (err) {
+                alert("Harap izinkan mode layar penuh (Fullscreen) untuk memulai ujian!");
+                return;
+            }
+
             introPage.classList.add('hidden');
             examPage.classList.remove('hidden');
             isExamActive = true;
             sessionStorage.setItem('examActive', 'true');
+            document.body.style.paddingBottom = "150px"; 
             
-            // Catat dimensi layar absolut HP saat ujian dimulai
-            initialWidth = window.innerWidth;
-            initialHeight = window.innerHeight;
-            
-            document.body.style.paddingBottom = "100px"; 
-            startHeartbeat();
+            // Catat rasio aspek murni HP saat dalam keadaan fullscreen penuh
+            setTimeout(() => {
+                targetRatio = window.innerHeight / window.innerWidth;
+                startCoreEngine();
+            }, 500);
+        }
+
+        async function lanjutkanUjian() {
+            try {
+                if (document.documentElement.requestFullscreen) {
+                    await document.documentElement.requestFullscreen();
+                }
+            } catch (e) {}
+
+            warningOverlay.classList.add('hidden');
+            setTimeout(() => { isExamActive = true; }, 500); 
         }
 
         function selesaiUjian() {
             isExamActive = false;
-            clearInterval(heartbeatInterval);
+            clearInterval(coreEngineInterval);
             sessionStorage.clear();
             examPage.classList.add('hidden');
-            alert("Ujian Selesai! Mengembalikan ke halaman awal.");
+            if (document.exitFullscreen) document.exitFullscreen();
+            alert("Ujian Selesai!");
             location.reload(); 
         }
 
         function catatPelanggaran(jenis) {
             if (!isExamActive) return; 
-            
             pelanggaran++;
             violationText.innerText = pelanggaran;
             sessionStorage.setItem('pelanggaranCount', pelanggaran);
@@ -250,113 +283,96 @@
             if (pelanggaran > maxPelanggaran) {
                 diskualifikasi();
             } else {
-                document.getElementById('warningText').innerText = `Terdeteksi: ${jenis}`;
+                document.getElementById('warningText').innerText = `Pelanggaran ke-${pelanggaran}`;
+                warningDetail.innerText = `Detail: ${jenis}`;
                 warningOverlay.classList.remove('hidden');
                 isExamActive = false; 
             }
         }
 
-        function tutupPeringatan() {
-            warningOverlay.classList.add('hidden');
-            // Update initial height untuk mencegah deteksi resize berulang akibat status bar
-            initialWidth = window.innerWidth;
-            initialHeight = window.innerHeight;
-            lastTime = Date.now(); // Reset timer
-            setTimeout(() => { isExamActive = true; }, 500); 
-        }
-
         function diskualifikasi() {
             isExamActive = false;
-            clearInterval(heartbeatInterval);
+            clearInterval(coreEngineInterval);
             sessionStorage.setItem('examActive', 'false');
             sessionStorage.setItem('disqualified', 'true'); 
             warningOverlay.classList.add('hidden');
             examPage.classList.add('hidden');
             disqualifiedOverlay.classList.remove('hidden');
+            if (document.exitFullscreen) document.exitFullscreen();
         }
 
         /* ==========================================
-           SENSOR ULTRA STRICT (LEVEL OS MANIPULATION)
+           CORE ENGINE: MAXIMUM SECURITY
            ========================================== */
-
-        // 1. SENSOR RESIZE EKSTREM (Anti Split-Screen & Rotasi Layar)
-        window.addEventListener('resize', () => {
-            if (!isExamActive) return;
-            
-            const currentWidth = window.innerWidth;
-            const currentHeight = window.innerHeight;
-            
-            // Cek jika lebar berubah (split screen vertikal) atau tinggi berkurang drastis lebih dari 25% (keyboard/split horizontal)
-            const widthChanged = Math.abs(currentWidth - initialWidth) > 20; 
-            const heightDropped = currentHeight < (initialHeight * 0.75); 
-
-            if (widthChanged || heightDropped) {
-                catatPelanggaran("Aktivasi Split-Screen, Pop-up App, atau Rotasi Layar");
-            }
-        });
-
-        // 2. SENSOR HEARTBEAT (Anti App-Freezing / Pop-up yang menutupi layar)
-        // Logika: OS akan menahan eksekusi Javascript jika browser ditimpa aplikasi berat lain
-        function startHeartbeat() {
-            lastTime = Date.now();
-            heartbeatInterval = setInterval(() => {
+        
+        function startCoreEngine() {
+            coreEngineInterval = setInterval(() => {
                 if (!isExamActive) return;
                 
-                let currentTime = Date.now();
-                let timeDiff = currentTime - lastTime;
-                
-                // Normalnya interval berjalan ~1000ms. Jika telat lebih dari 2.5 detik, 
-                // artinya browser sempat di-"tidurkan" oleh sistem operasi.
-                if (timeDiff > 2500) {
-                    catatPelanggaran("Browser dibekukan / Tertumpuk aplikasi lain");
+                // 1. DETEKSI FULLSCREEN KELUAR PAKSA
+                // Saat Split Screen aktif, browser otomatis kehilangan status fullscreen-nya.
+                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                    catatPelanggaran("Meninggalkan mode Fullscreen (Split Screen / Navigasi dibuka)");
+                    return;
                 }
-                lastTime = currentTime;
-            }, 1000);
+
+                // 2. DETEKSI ASPECT RATIO (Bentuk Layar)
+                // HP normal dalam mode potret memiliki rasio tinggi dibagi lebar sekitar 1.7 hingga 2.2
+                // Jika viewport tiba-tiba mengotak (rasio di bawah 1.3), itu pasti Split Screen atau Floating Keyboard ekstrem.
+                const currentRatio = window.innerHeight / window.innerWidth;
+                if (currentRatio < 1.3) {
+                    catatPelanggaran("Perubahan drastis bentuk layar (Terdeteksi Split Screen)");
+                    return;
+                }
+
+            }, 800); // Scan sangat cepat setiap 0.8 detik
         }
 
-        // 3. SENSOR MULTI-TOUCH (Anti Gesture Sistem / Screenshot 3 jari)
-        document.addEventListener('touchstart', (e) => {
-            if (isExamActive && e.touches.length > 1) {
-                e.preventDefault();
-                catatPelanggaran("Menggunakan Multi-Touch / Gesture Jari");
-            }
-        }, { passive: false });
-
-        // 4. SENSOR STANDAR LAINNYA
+        /* ==========================================
+           SENSOR TAMBAHAN & HIJACKING
+           ========================================== */
+        
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden' && isExamActive) {
-                catatPelanggaran("Kehilangan Fokus / Buka Notifikasi");
+                catatPelanggaran("Aplikasi berjalan di latar belakang");
             }
         });
 
         window.addEventListener('blur', () => {
-            if (isExamActive) catatPelanggaran("Pindah Aplikasi / Layar Tertutup Pop-up");
+            if (isExamActive) catatPelanggaran("Kehilangan fokus (Terdapat Pop-up atau Overlay)");
         });
 
         document.addEventListener('contextmenu', (event) => {
             if (isExamActive) {
                 event.preventDefault(); 
-                catatPelanggaran("Melakukan Long-Press");
+                catatPelanggaran("Aksi tahan layar (Long-press) diblokir");
             }
         });
 
-        window.addEventListener('beforeunload', function (e) {
-            if (isExamActive) {
+        // Memblokir interaksi sentuhan di area Dead-Zone (mencegah user iseng menarik notifikasi)
+        const deadZoneTop = document.querySelector('.dead-zone-top');
+        const deadZoneBottom = document.querySelector('.dead-zone-bottom');
+        
+        deadZoneTop.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); }, { passive: false });
+        deadZoneBottom.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); }, { passive: false });
+
+        document.addEventListener('touchstart', (e) => {
+            if (isExamActive && e.touches.length > 1) {
                 e.preventDefault();
-                e.returnValue = ''; 
+                catatPelanggaran("Multi-touch terdeteksi");
             }
-        });
+        }, { passive: false });
 
         window.addEventListener('scroll', () => {
             if (!isExamActive) return;
             const scrollPosition = Math.ceil(window.innerHeight + window.scrollY);
             const bodyHeight = document.body.offsetHeight;
-
             if (scrollPosition >= bodyHeight - 5) {
-                catatPelanggaran("Scroll paksa menabrak dasar halaman");
+                catatPelanggaran("Menarik batas akhir halaman (Scroll mentok)");
                 window.scrollTo({ top: window.scrollY - 150, behavior: 'smooth' });
             }
         });
+
     </script>
 </body>
 </html>
