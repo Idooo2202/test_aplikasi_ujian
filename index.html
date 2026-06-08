@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CBT - ABSOLUTE FINAL BOSS v5</title>
+    <title>CBT - NUCLEAR SECURITY v6</title>
     <style>
         :root {
-            --bg-color: #050505;
-            --container-bg: #111111;
+            --bg-color: #000000;
+            --container-bg: #0a0a0a;
             --text-color: #e0e0e0;
             --accent-color: #00e676;
             --warning-color: #ff003c;
-            --border-color: #222;
+            --border-color: #1a1a1a;
         }
 
         body {
@@ -27,7 +27,6 @@
             user-select: none;
             -webkit-touch-callout: none;
             touch-action: pan-y;
-            overflow-x: hidden;
         }
 
         .container {
@@ -35,7 +34,6 @@
             padding: 20px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.8);
             margin-bottom: 20px;
         }
 
@@ -53,9 +51,8 @@
             width: 100%;
             margin-top: 15px;
             text-transform: uppercase;
-            transition: 0.2s;
         }
-        button:disabled { background-color: #444; color: #888; cursor: not-allowed; }
+        button:disabled { background-color: #333; color: #666; cursor: not-allowed; }
         button:active:not(:disabled) { transform: scale(0.98); }
         
         .hidden { display: none !important; }
@@ -63,54 +60,43 @@
         .question-block {
             margin-bottom: 25px;
             padding-bottom: 15px;
-            border-bottom: 1px dashed #333;
+            border-bottom: 1px dashed #222;
         }
 
         .question-block p { font-size: 1.1rem; line-height: 1.5; }
 
         .options label {
-            display: block; margin: 10px 0; padding: 15px; background-color: #1a1a1a;
-            border-radius: 5px; cursor: pointer; border: 1px solid #333;
+            display: block; margin: 10px 0; padding: 15px; background-color: #111;
+            border-radius: 5px; cursor: pointer; border: 1px solid #222;
         }
 
         .options input[type="radio"] { transform: scale(1.3); margin-right: 15px; }
 
-        /* Overlay Super Ketat */
+        /* Overlay Super Solid (Tidak ada transparansi) */
         .overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: rgba(0, 0, 0, 0.99);
+            background-color: #000000; /* Hitam pekat, tidak bisa ngintip */
             display: flex; justify-content: center; align-items: center; flex-direction: column;
             z-index: 999999; color: var(--warning-color); text-align: center; padding: 20px; box-sizing: border-box;
         }
-
-        .overlay button { background-color: var(--warning-color); color: white; margin-top: 30px; width: 90%; }
 
         #statusBox {
             position: sticky; top: 0; background-color: #000; padding: 15px;
             margin: -20px -20px 20px -20px; border-bottom: 2px solid var(--warning-color);
             font-family: monospace; font-size: 1.2rem; z-index: 100; text-align: center;
         }
-
-        /* Dead Zones */
-        .dead-zone-top, .dead-zone-bottom { position: fixed; left: 0; width: 100%; height: 10px; z-index: 9998; background: transparent; }
-        .dead-zone-top { top: 0; }
-        .dead-zone-bottom { bottom: 0; }
     </style>
 </head>
 <body>
 
-    <div class="dead-zone-top"></div>
-    <div class="dead-zone-bottom"></div>
-
     <div id="introPage" class="container">
-        <h1>Absolute Final Boss v5</h1>
-        <p style="text-align: center; color: #888;">Hardware Baseline & Extension Scanner</p>
+        <h1>Nuclear Security v6</h1>
+        <p style="text-align: center; color: #888;">State-API Locking & DOM Wipe</p>
         <ul style="color: #bbb; padding-left: 20px; font-size: 0.95rem;">
-            <li>Sistem memindai Add-on / Ekstensi browser.</li>
-            <li>Mengunci resolusi perangkat keras murni.</li>
-            <li>Jika terdeteksi Pop-up, tombol "Lanjut" tidak akan bisa ditekan sampai Anda kembali ke layar penuh.</li>
+            <li>Wajib Fullscreen. Pop-up atau Jendela Mengambang akan instan diblokir.</li>
+            <li>Mengubah ukuran paksa via OS akan menghapus soal dari layar.</li>
         </ul>
-        <button onclick="mulaiUjian()">Verifikasi Sistem & Mulai</button>
+        <button onclick="mulaiUjian()">Masuk Fullscreen & Mulai</button>
     </div>
 
     <div id="examPage" class="container hidden">
@@ -118,68 +104,40 @@
             Pelanggaran: <span id="violationCount" style="color: var(--warning-color); font-weight: bold;">0</span> / 3
         </div>
         <div id="questionsContainer"></div>
-        <button onclick="selesaiUjian()">Kumpulkan Jawaban</button>
+        <button id="btnKumpulkan" onclick="selesaiUjian()">Kumpulkan Jawaban</button>
     </div>
 
     <div id="warningOverlay" class="overlay hidden">
-        <h1 style="font-size: 2.5rem; margin-bottom: 5px;">⚠️ TERDETEKSI ⚠️</h1>
-        <h2 id="warningText" style="font-size: 1.1rem; color: #fff;">Sistem Keamanan Terpicu!</h2>
+        <h1 style="font-size: 3rem; margin-bottom: 5px;">⚠️ TERDETEKSI ⚠️</h1>
         <div style="background: #111; padding: 15px; border-radius: 8px; border: 1px solid #333; margin-top: 15px; width: 100%;">
-            <p id="warningDetail" style="color: #ff003c; font-size: 0.9rem; font-family: monospace; margin:0;"></p>
+            <p id="warningDetail" style="color: #ff003c; font-size: 1rem; font-family: monospace; margin:0;"></p>
         </div>
         <p id="resolveText" style="color: #aaa; font-size: 0.85rem; margin-top: 20px;">
-            Anda tidak dapat melanjutkan ujian sebelum pelanggaran diperbaiki (Kembalikan ke layar penuh).
+            Akses dicabut. Soal telah disembunyikan.
         </p>
-        <button id="btnLanjut" onclick="lanjutkanUjian()" disabled>Memindai Keamanan...</button>
+        <button id="btnLanjut" onclick="cobaLanjutkan()" disabled>Harap Kembali Ke Fullscreen</button>
     </div>
 
     <div id="disqualifiedOverlay" class="overlay hidden">
         <h1 style="font-size: 3rem; color: var(--warning-color);">❌ BLOKIR ❌</h1>
-        <h2>Akses Ditolak Permanen.</h2>
+        <h2>Sesi Terkunci Permanen.</h2>
     </div>
 
     <script>
-        const questionsData = [
-            { q: "Apa fungsi dari tag <script> pada HTML?", opts: ["Menambahkan CSS", "Menyisipkan JavaScript", "Membuat tabel"] },
-            { q: "Manakah event JS yang terpicu saat user pindah ke aplikasi lain di HP?", opts: ["visibilitychange", "onhover", "ondblclick"] },
-            { q: "Apa nama properti CSS untuk mencegah pull-to-refresh di mobile?", opts: ["overflow: hidden", "overscroll-behavior-y: none", "touch-action: pan-x"] },
-            { q: "Framework apa yang menggunakan bahasa Dart?", opts: ["React Native", "Flutter", "Laravel"] },
-            { q: "Sistem bilangan yang terdiri dari angka 0 dan 1 disebut?", opts: ["Desimal", "Hexadesimal", "Biner"] }
-        ];
+        // Simpan HTML soal dalam variabel JavaScript agar bisa dihapus & dimunculkan lagi
+        const questionsHTML = `
+            <div class="question-block"><p><strong>1. Apa fungsi dari tag &lt;script&gt; pada HTML?</strong></p>
+            <div class="options"><label><input type="radio" name="q0"> Menambahkan CSS</label><label><input type="radio" name="q0"> Menyisipkan JavaScript</label></div></div>
+            <div class="question-block"><p><strong>2. Event JS saat pindah aplikasi?</strong></p>
+            <div class="options"><label><input type="radio" name="q1"> visibilitychange</label><label><input type="radio" name="q1"> onhover</label></div></div>
+            <div class="question-block"><p><strong>3. CSS mencegah pull-to-refresh?</strong></p>
+            <div class="options"><label><input type="radio" name="q2"> overflow: hidden</label><label><input type="radio" name="q2"> overscroll-behavior-y: none</label></div></div>
+        `;
 
-        const fullQuestions = [...questionsData, ...questionsData, ...questionsData];
-        const qContainer = document.getElementById('questionsContainer');
-        
-        fullQuestions.forEach((item, index) => {
-            let html = `<div class="question-block"><p><strong>${index + 1}. ${item.q}</strong></p><div class="options">`;
-            item.opts.forEach((opt, i) => {
-                html += `<label><input type="radio" name="q${index}" value="${i}"> ${opt}</label>`;
-            });
-            html += `</div></div>`;
-            qContainer.innerHTML += html;
-        });
-
-        // STATE VARIABLES
         let isExamActive = sessionStorage.getItem('examActive') === 'true';
         let pelanggaran = parseInt(sessionStorage.getItem('pelanggaranCount')) || 0;
         const maxPelanggaran = 3;
         let radarInterval;
-
-        // MENGUNCI BASELINE HARDWARE SAAT PERTAMA KALI DIBUKA
-        if (!sessionStorage.getItem('baseHardwareWidth')) {
-            // Mencegah user membuka ujian langsung dari floating window
-            // Asumsi rasio HP modern: tinggi pasti lebih besar dari 600px dan lebar > 300px
-            if (window.screen.height < 500 || window.screen.width < 300) {
-                alert("Tolong buka aplikasi ini di layar penuh terlebih dahulu!");
-                document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:50px;'>Akses ditolak. Layar tidak standar.</h1>";
-            } else {
-                sessionStorage.setItem('baseHardwareWidth', window.screen.width);
-                sessionStorage.setItem('baseHardwareHeight', window.screen.height);
-            }
-        }
-
-        const baselineW = parseInt(sessionStorage.getItem('baseHardwareWidth'));
-        const baselineH = parseInt(sessionStorage.getItem('baseHardwareHeight'));
 
         const introPage = document.getElementById('introPage');
         const examPage = document.getElementById('examPage');
@@ -188,7 +146,7 @@
         const violationText = document.getElementById('violationCount');
         const warningDetail = document.getElementById('warningDetail');
         const btnLanjut = document.getElementById('btnLanjut');
-        const resolveText = document.getElementById('resolveText');
+        const qContainer = document.getElementById('questionsContainer');
 
         window.onload = function() {
             violationText.innerText = pelanggaran;
@@ -205,90 +163,84 @@
 
         window.onpopstate = function() {
             window.history.pushState(null, "", window.location.href);
-            if (isExamActive) catatPelanggaran("Swipe navigasi dilarang.");
+            if (isExamActive) catatPelanggaran("Tombol navigasi OS diblokir.");
         };
 
-        // --- SISTEM DETEKSI EKSTENSI / ADD-ON ---
-        function cekEkstensiIlegal() {
-            let adaEkstensi = false;
-            let logDetail = "";
-
-            // 1. Cek Hijacking Fungsi Native (Biasanya dilakukan oleh script injeksi)
-            if (window.fetch.toString().indexOf('[native code]') === -1) { adaEkstensi = true; logDetail = "Native Fetch terinjeksi"; }
-            if (console.log.toString().indexOf('[native code]') === -1) { adaEkstensi = true; logDetail = "Console Output dimanipulasi"; }
-
-            // 2. Cek injeksi elemen DOM yang tidak wajar (Dark Reader, AdBlockers)
-            if (document.documentElement.hasAttribute('data-darkreader-scheme')) { adaEkstensi = true; logDetail = "Ekstensi Dark Reader aktif"; }
-            
-            // 3. Cek global variable spesifik Add-on
-            if (window.__VUE_DEVTOOLS_GLOBAL_HOOK__ || window.__REACT_DEVTOOLS_GLOBAL_HOOK__) { adaEkstensi = true; logDetail = "DevTools Ekstensi aktif"; }
-            
-            // 4. Deteksi Browser Extensions API yang terekspos ke halaman
-            if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) { adaEkstensi = true; logDetail = "Chrome Extension API terekspos"; }
-
-            return { terdeteksi: adaEkstensi, detail: logDetail };
+        // FUNGSI HELPER: Cek apakah benar-benar Fullscreen
+        function isStrictlyFullscreen() {
+            return document.fullscreenElement || 
+                   document.webkitFullscreenElement || 
+                   document.mozFullScreenElement || 
+                   document.msFullscreenElement;
         }
 
         async function mulaiUjian() {
-            const scanEkstensi = cekEkstensiIlegal();
-            if (scanEkstensi.terdeteksi) {
-                alert(`Sistem menolak akses! Harap matikan ekstensi browser Anda.\nDetail: ${scanEkstensi.detail}`);
+            try {
+                if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
+                else if (document.documentElement.webkitRequestFullscreen) await document.documentElement.webkitRequestFullscreen();
+            } catch (err) {
+                alert("Browser tidak mengizinkan Fullscreen. Ujian tidak bisa dimulai.");
                 return;
             }
 
-            try {
-                if (document.documentElement.requestFullscreen) {
-                    await document.documentElement.requestFullscreen();
-                }
-            } catch (err) {}
+            // Render soal ke dalam DOM
+            qContainer.innerHTML = questionsHTML;
 
             introPage.classList.add('hidden');
             examPage.classList.remove('hidden');
             isExamActive = true;
             sessionStorage.setItem('examActive', 'true');
             
-            startUnstoppableRadar(); // Radar mulai berputar tanpa henti
+            startNuclearRadar(); // Nyalakan Radar Super Cepat
         }
 
-        function lanjutkanUjian() {
+        async function cobaLanjutkan() {
+            // Minta fullscreen lagi
             try {
-                if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+                if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
+                else if (document.documentElement.webkitRequestFullscreen) await document.documentElement.webkitRequestFullscreen();
             } catch (e) {}
-            
-            warningOverlay.classList.add('hidden');
-            qContainer.classList.remove('hidden'); // Tampilkan soal kembali
-            isExamActive = true;
+
+            // Cek apakah berhasil Fullscreen
+            setTimeout(() => {
+                if (isStrictlyFullscreen()) {
+                    warningOverlay.classList.add('hidden');
+                    qContainer.innerHTML = questionsHTML; // KEMBALIKAN SOAL KE LAYAR
+                    document.getElementById('btnKumpulkan').classList.remove('hidden');
+                    isExamActive = true;
+                } else {
+                    alert("Gagal masuk mode aman! Besarkan kembali jendela (jangan pakai floating window).");
+                }
+            }, 300);
         }
 
         function selesaiUjian() {
             isExamActive = false;
             clearInterval(radarInterval);
             sessionStorage.clear();
-            examPage.classList.add('hidden');
-            if (document.exitFullscreen) document.exitFullscreen();
-            alert("Ujian Selesai! Kamu berhasil mencapai akhir tanpa blokir.");
+            alert("Ujian Selesai!");
             location.reload(); 
         }
 
         function catatPelanggaran(jenis) {
-            if (!isExamActive) return; // Mencegah hitungan dobel saat overlay sudah muncul
+            if (!isExamActive) return; 
             
             pelanggaran++;
             violationText.innerText = pelanggaran;
             sessionStorage.setItem('pelanggaranCount', pelanggaran);
             
+            isExamActive = false; 
+            
+            // THE DOM WIPE (Hapus soal secara fisik dari HTML)
+            qContainer.innerHTML = ""; 
+            document.getElementById('btnKumpulkan').classList.add('hidden');
+            
             if (pelanggaran >= maxPelanggaran) {
                 diskualifikasi();
             } else {
-                isExamActive = false; // Hentikan interaksi user
-                qContainer.classList.add('hidden'); // SEMBUNYIKAN SOAL! (Mencegah farming jawaban)
-                
-                document.getElementById('warningText').innerText = `Peringatan [${pelanggaran}/${maxPelanggaran}]`;
                 warningDetail.innerText = `>> ${jenis}`;
                 warningOverlay.classList.remove('hidden');
-                
-                btnLanjut.disabled = true; // Kunci tombol lanjut
-                btnLanjut.innerText = "Memindai Lingkungan Layar...";
+                btnLanjut.disabled = true; 
             }
         }
 
@@ -304,76 +256,48 @@
         }
 
         /* ==========================================
-           THE UNSTOPPABLE RADAR (STATE LOCKING)
+           NUCLEAR RADAR (100ms PING)
            ========================================== */
         
-        function startUnstoppableRadar() {
+        function startNuclearRadar() {
+            // Berjalan sangat cepat: 10 kali dalam 1 detik
             radarInterval = setInterval(() => {
                 
-                // 1. Eksekusi Radar Terhadap Baseline Hardware Asli
-                // Mengabaikan 'window.screen.width' saat ini karena bisa dipalsukan OS saat Pop-up.
-                // Kita bandingkan lebar window SAAT INI dengan lebar hardware AWAL.
-                const currentWidth = window.innerWidth;
-                const currentHeight = window.innerHeight;
-                
-                // Jika lebar browser kurang dari 85% lebar hardware asli HP = Pasti Pop-Up / Split.
-                const isPopUpMode = currentWidth < (baselineW * 0.85);
-                const isSplitScreenMode = currentHeight < (baselineH * 0.65);
+                // 1. CEK API FULLSCREEN (Pembunuh Floating Window)
+                // Jika OS memaksa aplikasi menjadi Floating Window, API ini otomatis mati (null).
+                const isFs = isStrictlyFullscreen();
+                const isHidden = document.hidden || document.visibilityState === 'hidden';
+                const isFocused = document.hasFocus();
 
-                let statusLingkunganAman = true;
-                let errorMssg = "";
-
-                if (isPopUpMode) { statusLingkunganAman = false; errorMssg = "Mode Pop-up Terdeteksi!"; }
-                else if (isSplitScreenMode) { statusLingkunganAman = false; errorMssg = "Mode Layar Terbelah (Split) Terdeteksi!"; }
-                else if (!document.hasFocus()) { statusLingkunganAman = false; errorMssg = "Kehilangan Fokus (Ada aplikasi numpuk di atas)!"; }
-
-                // LOGIKA PENGUNCI (STATE MACHINE)
-                if (isExamActive && !statusLingkunganAman) {
-                    // Jika ujian sedang berjalan dan kondisi tidak aman -> HANTAM!
-                    catatPelanggaran(errorMssg);
+                if (isExamActive) {
+                    if (!isFs) {
+                        catatPelanggaran("Terdeteksi Keluar Layar Penuh (Pop-up/Floating Window aktif!)");
+                    } else if (isHidden) {
+                        catatPelanggaran("Browser terminimize atau ditimpa layar lain!");
+                    } else if (!isFocused) {
+                        catatPelanggaran("Kehilangan fokus (Terdapat notifikasi/aplikasi lain di atas layar)!");
+                    }
                 } 
-                else if (!isExamActive && warningOverlay.classList.contains('hidden') === false) {
-                    // Jika sedang dihukum (Overlay aktif), radar terus memantau apakah user SUDAH tobat.
-                    if (statusLingkunganAman) {
+                // JIKA SEDANG DIHUKUM (OVERLAY MUNCUL)
+                else if (!isExamActive && !warningOverlay.classList.contains('hidden')) {
+                    // Validasi absolut untuk mengaktifkan tombol lanjut
+                    if (isFs && !isHidden && isFocused) {
                         btnLanjut.disabled = false;
-                        btnLanjut.innerText = "Kondisi Aman. Lanjutkan Ujian";
-                        resolveText.style.color = "#00e676";
-                        resolveText.innerText = "Layar sudah kembali normal.";
+                        btnLanjut.innerText = "Kondisi Aman. Klik Untuk Lanjut";
+                        btnLanjut.style.backgroundColor = "#00e676";
+                        btnLanjut.style.color = "#000";
                     } else {
                         btnLanjut.disabled = true;
-                        btnLanjut.innerText = "Harap Kembalikan ke Layar Penuh";
-                        resolveText.style.color = "#aaa";
-                        resolveText.innerText = "Anda tidak dapat melanjutkan sebelum pelanggaran diperbaiki.";
+                        btnLanjut.innerText = "MAKSIMALKAN JENDELA KE LAYAR PENUH";
+                        btnLanjut.style.backgroundColor = "#333";
+                        btnLanjut.style.color = "#666";
                     }
                 }
-
-                // Cek ekstensi secara berkala (Takutnya diaktifkan di tengah jalan)
-                if (isExamActive) {
-                    const cekExt = cekEkstensiIlegal();
-                    if(cekExt.terdeteksi) catatPelanggaran(cekExt.detail);
-                }
-
-            }, 400); // Scan sangat agresif tiap 0.4 detik!
+            }, 100); 
         }
 
-        /* ==========================================
-           SENSOR EVENT DRIVEN STANDAR
-           ========================================== */
-        
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'hidden' && isExamActive) catatPelanggaran("Aplikasi berjalan di Background");
-        });
-
-        document.addEventListener('contextmenu', (event) => {
-            if (isExamActive) { event.preventDefault(); catatPelanggaran("Long-press diblokir"); }
-        });
-
-        document.addEventListener('touchstart', (e) => {
-            if (isExamActive && e.touches.length > 1) {
-                e.preventDefault(); catatPelanggaran("Multi-touch / Gesture OS diblokir");
-            }
-        }, { passive: false });
-
+        // Pemblokir gesture dasar
+        document.addEventListener('contextmenu', (e) => { if(isExamActive) { e.preventDefault(); catatPelanggaran("Aksi Ilegal"); }});
     </script>
 </body>
 </html>
