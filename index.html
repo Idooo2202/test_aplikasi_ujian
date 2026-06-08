@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Ujian Ketat</title>
+    <style>
+        /* Menggunakan tema dark/high-contrast */
+        :root {
+            --bg-color: #000000;
+            --container-bg: #121212;
+            --text-color: #e0e0e0;
+            --accent-color: #00e676;
+            --warning-color: #ff1744;
+            --border-color: #333333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            user-select: none; /* Mencegah blok teks/copy */
+        }
+
+        .container {
+            background-color: var(--container-bg);
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        h1, h2 {
+            margin-top: 0;
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background-color: #00c853;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .question-block {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .options label {
+            display: block;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+
+        /* Modal Peringatan Fullscreen */
+        #warningOverlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+            color: var(--warning-color);
+            text-align: center;
+            padding: 20px;
+        }
+
+        #warningOverlay button {
+            background-color: var(--warning-color);
+            color: white;
+            margin-top: 20px;
+        }
+
+        #statusBox {
+            background-color: #222;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--accent-color);
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="introPage" class="container">
+        <h1>Simulasi Ujian CBT</h1>
+        <p>Aplikasi ini dilengkapi sensor pendeteksi kecurangan yang sangat ketat.</p>
+        <ul style="color: #bbb;">
+            <li>Dilarang membuka tab/aplikasi lain.</li>
+            <li>Dilarang klik di luar area browser.</li>
+            <li>Dilarang menggunakan klik kanan.</li>
+            <li>Maksimal pelanggaran: 3 kali. Lebih dari itu ujian otomatis dihentikan.</li>
+        </ul>
+        <button onclick="mulaiUjian()">Mulai Ujian Sekarang</button>
+    </div>
+
+    <div id="examPage" class="container hidden">
+        <div id="statusBox">
+            Pelanggaran: <span id="violationCount" style="color: var(--warning-color); font-weight: bold;">0</span> / 3
+        </div>
+        
+        <div class="question-block">
+            <p><strong>1. Apa fungsi dari tag &lt;script&gt; pada HTML?</strong></p>
+            <div class="options">
+                <label><input type="radio" name="q1" value="a"> Menambahkan gaya CSS</label>
+                <label><input type="radio" name="q1" value="b"> Menyisipkan kode JavaScript</label>
+                <label><input type="radio" name="q1" value="c"> Membuat tabel data</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <p><strong>2. Manakah dari berikut ini yang merupakan event untuk mendeteksi hilangnya fokus kursor dari browser?</strong></p>
+            <div class="options">
+                <label><input type="radio" name="q2" value="a"> onblur</label>
+                <label><input type="radio" name="q2" value="b"> onclick</label>
+                <label><input type="radio" name="q2" value="c"> onhover</label>
+            </div>
+        </div>
+
+        <button onclick="selesaiUjian()">Kumpulkan Ujian</button>
+    </div>
+
+    <div id="warningOverlay" class="hidden">
+        <h1 style="font-size: 3rem;">⚠️ PERINGATAN! ⚠️</h1>
+        <h2 id="warningText">Anda terdeteksi meninggalkan halaman ujian!</h2>
+        <p>Aktivitas Anda telah dicatat oleh sistem.</p>
+        <button onclick="tutupPeringatan()">Saya Mengerti, Lanjutkan Ujian</button>
+    </div>
+
+    <div id="disqualifiedOverlay" class="hidden">
+        <h1 style="font-size: 3rem; color: var(--warning-color);">❌ DISKUALIFIKASI ❌</h1>
+        <h2>Anda telah melakukan pelanggaran lebih dari 3 kali.</h2>
+        <p>Ujian Anda dihentikan secara paksa dan mendapat nilai 0.</p>
+    </div>
+
+    <script>
+        let isExamActive = false;
+        let pelanggaran = 0;
+        const maxPelanggaran = 3;
+
+        const introPage = document.getElementById('introPage');
+        const examPage = document.getElementById('examPage');
+        const warningOverlay = document.getElementById('warningOverlay');
+        const disqualifiedOverlay = document.getElementById('disqualifiedOverlay');
+        const violationText = document.getElementById('violationCount');
+
+        function mulaiUjian() {
+            introPage.classList.add('hidden');
+            examPage.classList.remove('hidden');
+            isExamActive = true;
+            
+            // Opsional: Memaksa browser menjadi Fullscreen untuk mode strict
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch((e) => console.log("Fullscreen diblokir"));
+            }
+        }
+
+        function selesaiUjian() {
+            isExamActive = false;
+            examPage.classList.add('hidden');
+            alert("Ujian berhasil dikumpulkan. Terima kasih!");
+            location.reload(); // Reset halaman
+        }
+
+        function catatPelanggaran(jenis) {
+            if (!isExamActive) return; // Jangan catat jika ujian belum mulai
+            
+            pelanggaran++;
+            violationText.innerText = pelanggaran;
+            
+            if (pelanggaran > maxPelanggaran) {
+                diskualifikasi();
+            } else {
+                document.getElementById('warningText').innerText = `Pelanggaran: ${jenis}`;
+                warningOverlay.classList.remove('hidden');
+                isExamActive = false; // Jeda ujian sementara popup muncul
+            }
+        }
+
+        function tutupPeringatan() {
+            warningOverlay.classList.add('hidden');
+            // Sedikit delay sebelum mengaktifkan sensor lagi agar tidak double trigger
+            setTimeout(() => { isExamActive = true; }, 500); 
+        }
+
+        function diskualifikasi() {
+            isExamActive = false;
+            warningOverlay.classList.add('hidden');
+            examPage.classList.add('hidden');
+            disqualifiedOverlay.classList.remove('hidden');
+            
+            // Keluar dari fullscreen jika diskualifikasi
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+
+        /* =========================================
+           FITUR DETEKTOR KETAT (CORE LOGIC)
+           ========================================= */
+
+        // 1. Deteksi ganti Tab / Minimize (Page Visibility API)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden' && isExamActive) {
+                catatPelanggaran("Membuka Tab Baru / Minimize Aplikasi");
+            }
+        });
+
+        // 2. Deteksi kursor keluar dari jendela browser (Window Blur)
+        window.addEventListener('blur', () => {
+            if (isExamActive) {
+                catatPelanggaran("Kursor / Fokus keluar dari browser");
+            }
+        });
+
+        // 3. Mencegah Klik Kanan (Context Menu)
+        document.addEventListener('contextmenu', (event) => {
+            if (isExamActive) {
+                event.preventDefault(); // Memblokir menu default
+                catatPelanggaran("Mencoba menggunakan Klik Kanan");
+            }
+        });
+
+        // 4. Mencegah Shortcut Keyboard (Copy, Paste, Inspect Element)
+        document.addEventListener('keydown', (event) => {
+            if (!isExamActive) return;
+
+            // Mencegah F12 (Inspect)
+            if (event.key === "F12") {
+                event.preventDefault();
+                catatPelanggaran("Mencoba membuka Developer Tools (F12)");
+            }
+            // Mencegah Ctrl+C (Copy), Ctrl+V (Paste), Ctrl+U (View Source)
+            if (event.ctrlKey && (event.key === 'c' || event.key === 'v' || event.key === 'u' || event.key === 'C' || event.key === 'V' || event.key === 'U')) {
+                event.preventDefault();
+                catatPelanggaran("Mencoba menggunakan Shortcut (Copy/Paste/View Source)");
+            }
+        });
+    </script>
+</body>
+</html>
