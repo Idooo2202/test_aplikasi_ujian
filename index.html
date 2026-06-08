@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistem Ujian CBT Mobile</title>
+    <title>Sistem Ujian CBT Mobile - Ultra Strict</title>
     <style>
-        /* Tema Gelap Pekat (High Contrast) & Optimasi Mobile */
         :root {
             --bg-color: #000000;
             --container-bg: #121212;
@@ -22,13 +21,13 @@
             margin: 0;
             padding: 15px;
             
-            /* SANGAT PENTING UNTUK MOBILE: Mencegah pull-to-refresh dan blok teks */
             overscroll-behavior-y: none; 
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
-            -webkit-touch-callout: none; /* Mencegah popup menu saat long-press di iOS/Android */
+            -webkit-touch-callout: none;
+            touch-action: pan-y; /* Hanya izinkan scroll vertikal, blokir zoom/pan horizontal */
         }
 
         .container {
@@ -46,12 +45,12 @@
             background-color: var(--accent-color);
             color: #000;
             border: none;
-            padding: 15px 20px; /* Padding lebih besar agar mudah disentuh di HP */
+            padding: 15px 20px;
             font-size: 16px;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
-            width: 100%; /* Tombol full width di HP */
+            width: 100%;
             margin-top: 10px;
         }
 
@@ -84,7 +83,6 @@
             margin-right: 10px;
         }
 
-        /* Overlay Fullscreen untuk Peringatan di dalam viewport */
         .overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -126,15 +124,13 @@
 <body>
 
     <div id="introPage" class="container">
-        <h1>Simulasi CBT Mobile</h1>
-        <p>Sensor sangat sensitif. Pastikan Anda tidak melakukan hal berikut:</p>
+        <h1>Simulasi CBT Mobile - Ultra Strict</h1>
+        <p>Selain sensor dasar, sistem ini memonitor manipulasi OS tingkat lanjut.</p>
         <ul style="color: #bbb; padding-left: 20px;">
-            <li>Menarik layar ke bawah (Pull-to-refresh).</li>
-            <li>Membuka bar notifikasi atas.</li>
-            <li>Membuka panel Recent Apps / Split screen.</li>
-            <li>Melakukan Long-Press (tahan layar).</li>
-            <li>Melakukan Swipe gesture untuk 'Back'.</li>
-            <li>Scroll cepat hingga menabrak dasar halaman.</li>
+            <li>Dilarang mengaktifkan Split Screen.</li>
+            <li>Dilarang membuka Pop-up / Floating Window.</li>
+            <li>Dilarang memutar rotasi layar.</li>
+            <li>Dilarang menggunakan *gesture* multi-jari.</li>
         </ul>
         <button onclick="mulaiUjian()">Mulai Ujian</button>
     </div>
@@ -143,27 +139,23 @@
         <div id="statusBox">
             Pelanggaran: <span id="violationCount" style="color: var(--warning-color); font-weight: bold;">0</span> / 3
         </div>
-        
         <div id="questionsContainer"></div>
-
         <button onclick="selesaiUjian()">Kumpulkan Jawaban</button>
     </div>
 
     <div id="warningOverlay" class="overlay hidden">
         <h1 style="font-size: 2.5rem; margin-bottom: 10px;">⚠️ PERINGATAN! ⚠️</h1>
-        <h2 id="warningText" style="font-size: 1.2rem; color: #fff;">Anda terdeteksi meninggalkan halaman ujian!</h2>
+        <h2 id="warningText" style="font-size: 1.2rem; color: #fff;">Sistem mendeteksi aktivitas mencurigakan!</h2>
         <p style="color: #aaa;">Aktivitas Anda telah dicatat oleh sistem.</p>
         <button onclick="tutupPeringatan()">Lanjutkan Ujian</button>
     </div>
 
     <div id="disqualifiedOverlay" class="overlay hidden">
         <h1 style="font-size: 2.5rem; color: var(--warning-color);">❌ BLOKIR ❌</h1>
-        <h2>Anda melakukan pelanggaran lebih dari 3 kali.</h2>
-        <p style="color: #aaa;">Sistem telah mengunci sesi Anda secara permanen. Silakan lapor ke pengawas.</p>
+        <h2>Sesi dikunci secara permanen.</h2>
     </div>
 
     <script>
-        // Data Soal Dummy (10 Soal untuk simulasi scrolling)
         const questionsData = [
             { q: "Apa fungsi dari tag <script> pada HTML?", opts: ["Menambahkan CSS", "Menyisipkan JavaScript", "Membuat tabel"] },
             { q: "Manakah event JS yang terpicu saat user pindah ke aplikasi lain di HP?", opts: ["visibilitychange", "onhover", "ondblclick"] },
@@ -177,7 +169,6 @@
             { q: "Sistem bilangan yang terdiri dari angka 0 dan 1 disebut?", opts: ["Desimal", "Hexadesimal", "Biner"] }
         ];
 
-        // Render Soal ke HTML
         const qContainer = document.getElementById('questionsContainer');
         questionsData.forEach((item, index) => {
             let html = `<div class="question-block"><p><strong>${index + 1}. ${item.q}</strong></p><div class="options">`;
@@ -188,12 +179,15 @@
             qContainer.innerHTML += html;
         });
 
-        // ==========================================
-        // STATE MANAGEMENT & PERSISTENCE
-        // ==========================================
         let isExamActive = sessionStorage.getItem('examActive') === 'true';
         let pelanggaran = parseInt(sessionStorage.getItem('pelanggaranCount')) || 0;
         const maxPelanggaran = 3;
+
+        // Variabel untuk sensor lanjutan
+        let initialWidth = 0;
+        let initialHeight = 0;
+        let lastTime = Date.now();
+        let heartbeatInterval;
 
         const introPage = document.getElementById('introPage');
         const examPage = document.getElementById('examPage');
@@ -203,24 +197,24 @@
 
         window.onload = function() {
             violationText.innerText = pelanggaran;
-            
             if (isExamActive) {
                 introPage.classList.add('hidden');
                 examPage.classList.remove('hidden');
+                // Mengambil ulang dimensi awal setelah refresh
+                initialWidth = window.innerWidth;
+                initialHeight = window.innerHeight;
+                startHeartbeat();
                 catatPelanggaran("Refresh / Memuat ulang halaman");
             } else if (sessionStorage.getItem('disqualified') === 'true') {
                 introPage.classList.add('hidden');
                 disqualifiedOverlay.classList.remove('hidden');
             }
-            
             window.history.pushState(null, "", window.location.href);
         };
 
         window.onpopstate = function() {
             window.history.pushState(null, "", window.location.href);
-            if (isExamActive) {
-                catatPelanggaran("Swipe Back / Tombol Kembali HP");
-            }
+            if (isExamActive) catatPelanggaran("Swipe Back / Tombol Kembali HP");
         };
 
         function mulaiUjian() {
@@ -228,12 +222,18 @@
             examPage.classList.remove('hidden');
             isExamActive = true;
             sessionStorage.setItem('examActive', 'true');
-            // Menambah jarak ekstra di bawah agar mentok scroll tidak terlalu mudah terpicu tanpa sengaja
+            
+            // Catat dimensi layar absolut HP saat ujian dimulai
+            initialWidth = window.innerWidth;
+            initialHeight = window.innerHeight;
+            
             document.body.style.paddingBottom = "100px"; 
+            startHeartbeat();
         }
 
         function selesaiUjian() {
             isExamActive = false;
+            clearInterval(heartbeatInterval);
             sessionStorage.clear();
             examPage.classList.add('hidden');
             alert("Ujian Selesai! Mengembalikan ke halaman awal.");
@@ -258,46 +258,88 @@
 
         function tutupPeringatan() {
             warningOverlay.classList.add('hidden');
+            // Update initial height untuk mencegah deteksi resize berulang akibat status bar
+            initialWidth = window.innerWidth;
+            initialHeight = window.innerHeight;
+            lastTime = Date.now(); // Reset timer
             setTimeout(() => { isExamActive = true; }, 500); 
         }
 
         function diskualifikasi() {
             isExamActive = false;
+            clearInterval(heartbeatInterval);
             sessionStorage.setItem('examActive', 'false');
             sessionStorage.setItem('disqualified', 'true'); 
-            
             warningOverlay.classList.add('hidden');
             examPage.classList.add('hidden');
             disqualifiedOverlay.classList.remove('hidden');
         }
 
-        // ==========================================
-        // SENSOR SUPER KETAT UNTUK MOBILE
-        // ==========================================
+        /* ==========================================
+           SENSOR ULTRA STRICT (LEVEL OS MANIPULATION)
+           ========================================== */
 
-        // 1. Deteksi Bar Notifikasi / Recent Apps / Split Screen / Screen Off
+        // 1. SENSOR RESIZE EKSTREM (Anti Split-Screen & Rotasi Layar)
+        window.addEventListener('resize', () => {
+            if (!isExamActive) return;
+            
+            const currentWidth = window.innerWidth;
+            const currentHeight = window.innerHeight;
+            
+            // Cek jika lebar berubah (split screen vertikal) atau tinggi berkurang drastis lebih dari 25% (keyboard/split horizontal)
+            const widthChanged = Math.abs(currentWidth - initialWidth) > 20; 
+            const heightDropped = currentHeight < (initialHeight * 0.75); 
+
+            if (widthChanged || heightDropped) {
+                catatPelanggaran("Aktivasi Split-Screen, Pop-up App, atau Rotasi Layar");
+            }
+        });
+
+        // 2. SENSOR HEARTBEAT (Anti App-Freezing / Pop-up yang menutupi layar)
+        // Logika: OS akan menahan eksekusi Javascript jika browser ditimpa aplikasi berat lain
+        function startHeartbeat() {
+            lastTime = Date.now();
+            heartbeatInterval = setInterval(() => {
+                if (!isExamActive) return;
+                
+                let currentTime = Date.now();
+                let timeDiff = currentTime - lastTime;
+                
+                // Normalnya interval berjalan ~1000ms. Jika telat lebih dari 2.5 detik, 
+                // artinya browser sempat di-"tidurkan" oleh sistem operasi.
+                if (timeDiff > 2500) {
+                    catatPelanggaran("Browser dibekukan / Tertumpuk aplikasi lain");
+                }
+                lastTime = currentTime;
+            }, 1000);
+        }
+
+        // 3. SENSOR MULTI-TOUCH (Anti Gesture Sistem / Screenshot 3 jari)
+        document.addEventListener('touchstart', (e) => {
+            if (isExamActive && e.touches.length > 1) {
+                e.preventDefault();
+                catatPelanggaran("Menggunakan Multi-Touch / Gesture Jari");
+            }
+        }, { passive: false });
+
+        // 4. SENSOR STANDAR LAINNYA
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden' && isExamActive) {
-                catatPelanggaran("Aplikasi kehilangan fokus (Notifikasi/Recent Apps)");
+                catatPelanggaran("Kehilangan Fokus / Buka Notifikasi");
             }
         });
 
-        // 2. Deteksi Blur (Kehilangan fokus window, sering terpicu di Android saat popup sistem muncul)
         window.addEventListener('blur', () => {
-            if (isExamActive) {
-                catatPelanggaran("Kehilangan fokus layar");
-            }
+            if (isExamActive) catatPelanggaran("Pindah Aplikasi / Layar Tertutup Pop-up");
         });
 
-        // 3. Mencegah Long-Press Text Selection (Sebagai backup dari CSS)
         document.addEventListener('contextmenu', (event) => {
             if (isExamActive) {
                 event.preventDefault(); 
-                catatPelanggaran("Melakukan Long-Press / Tahan Layar");
+                catatPelanggaran("Melakukan Long-Press");
             }
         });
 
-        // 4. Deteksi Refresh via UI HP / Browser Reload Button
         window.addEventListener('beforeunload', function (e) {
             if (isExamActive) {
                 e.preventDefault();
@@ -305,23 +347,14 @@
             }
         });
 
-        // 5. Sensor Scroll Bawah Ekstrem (Mentok Bawah)
-        // Disesuaikan untuk mobile karena pantulan elastic scrolling (rubber-banding)
         window.addEventListener('scroll', () => {
             if (!isExamActive) return;
-            
-            // Math.ceil digunakan karena di HP sering menghasilkan angka desimal saat di-scroll
             const scrollPosition = Math.ceil(window.innerHeight + window.scrollY);
             const bodyHeight = document.body.offsetHeight;
 
             if (scrollPosition >= bodyHeight - 5) {
                 catatPelanggaran("Scroll paksa menabrak dasar halaman");
-                
-                // Pantulkan layar ke atas dengan halus agar sensor tidak loop
-                window.scrollTo({
-                    top: window.scrollY - 150,
-                    behavior: 'smooth'
-                });
+                window.scrollTo({ top: window.scrollY - 150, behavior: 'smooth' });
             }
         });
     </script>
